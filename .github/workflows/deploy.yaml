@@ -3,6 +3,11 @@ name: Build and Deploy to AKS
 on:
   push:
     branches: [ "main" ]
+
+  pull_request:
+    branches: [ "main" ]
+    types: [opened, synchronize, reopened]
+
   workflow_dispatch:
 
 permissions:
@@ -12,6 +17,7 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       # 1. Checkout Code
       - name: Checkout Code
@@ -28,7 +34,6 @@ jobs:
         run: az acr login --name ${{ secrets.ACR_NAME }}
 
       # 4. Build and Push Docker Image
-      # We use the GitHub Commit SHA as the image tag for versioning
       - name: Build and Push Image
         run: |
           docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/simple-app:${{ github.sha }} .
